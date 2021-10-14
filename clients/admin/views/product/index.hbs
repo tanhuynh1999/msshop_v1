@@ -1,0 +1,94 @@
+<div class="row">
+    <div class="col-sm-12 mt-1">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-header-text" v-text="title"></h5>
+            </div>
+            <div class="card-block">
+                <div class="row">
+                    <div class="col-sm-12 table-responsive">
+                        {{> products/common/button}}
+                        <el-tabs v-model="tabMain" class="mt-1" @tab-click="handleClickMain">
+                            <el-tab-pane v-for="item in listData.listTabMain" :key="item.name"
+                                :label="item.label + '(0)'" :name="item.name">
+                                {{> products/common/filter}}
+                                {{> products/common/show}}
+                                <hr>
+                                <b>Có <span class="text-danger">0</span> sản phẩm</b>
+                                <el-table ref="multipleTable" :data="tableData" style="width: 100%"
+                                    @selection-change="handleSelectionChange" class="t-table mt-1">
+                                    <el-table-column type="selection" width="55">
+                                    </el-table-column>
+                                    <el-table-column type="index" label="STT" width="55">
+                                    </el-table-column>
+                                    <el-table-column prop="code" label="Mã" width="100">
+                                    </el-table-column>
+                                    <el-table-column prop="image" label="Hình ảnh" width="120">
+                                        <template slot-scope="scope">
+                                            <img class="image" :src="scope.row.image" alt="" srcset="">
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column prop="name" label="Tên" width="200">
+                                    </el-table-column>
+                                    <el-table-column prop="price" label="Giá sản phẩm">
+                                        <template slot-scope="scope">
+                                            <span v-text="priceFormat(scope.row.price)"></span>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column prop="price" label="Giá bán">
+                                        <template slot-scope="scope">
+                                            <span
+                                                v-text="priceSumFormat(scope.row.price, scope.row.percentDiscount)"></span>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column prop="dateCreate" label="Ngày tạo">
+                                        <template slot-scope="scope">
+                                            <span v-text="dateCreateFormat(scope.row.dateCreate)"></span>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column prop="dateModified" label="Ngày sửa">
+                                        <template slot-scope="scope">
+                                            <span v-text="dateModifiedFormat(scope.row.dateModified)"></span>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column prop="view" label="Lượt xem">
+                                    </el-table-column>
+                                    <el-table-column label="Danh mục" width="200" v-if="showTable.showCategory">
+                                        <template slot-scope="scope">
+                                            <el-tag class="mt-1 ml-1" closable type="info">Áo thun</el-tag>
+                                            <el-tag class="mt-1 ml-1" closable type="info">Áo nam</el-tag>
+                                            <el-tag class="mt-1 ml-1" closable type="info">Áo không phải nữ</el-tag>
+                                            <el-tag class="mt-1 ml-1 cp">
+                                                <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                                            </el-tag>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column label="Hành động" width="200" fixed="right">
+                                        <template slot-scope="scope">
+                                            <span class="btn-active cp">
+                                                <i class="fa fa-eye" aria-hidden="true"></i> |
+                                            </span>
+                                            <span class="btn-active cp">
+                                                <i class="fa fa-edit" aria-hidden="true"></i> |
+                                            </span>
+                                            <span class="btn-active cp">
+                                                <i class="fa fa-bell" aria-hidden="true"></i> |
+                                            </span>
+                                            <span class="btn-active cp">
+                                                <i class="fa fa-comment" aria-hidden="true"></i> |
+                                            </span>
+                                            <span class="btn-active cp">
+                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                            </span>
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
+                            </el-tab-pane>
+                        </el-tabs>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="js/product/app.js"></script>
