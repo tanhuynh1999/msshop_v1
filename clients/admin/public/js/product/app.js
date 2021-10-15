@@ -36,7 +36,71 @@ const app = new Vue({
                         _id: 4,
                         name: 'Bật hoạt động'
                     }
+                ],
+                listCategory: [{
+                        _id: 1,
+                        name: 'Áo'
+                    },
+                    {
+                        _id: 2,
+                        name: 'Quần'
+                    }
                 ]
+            },
+            productForm: {
+                name: '',
+                image: '',
+                code: '',
+                price: 0,
+                view: 1,
+                describe: '',
+                content: '',
+                percentDiscount: 0,
+                active: true,
+                category: []
+            },
+            productValidate: {
+                name: [{
+                    required: true,
+                    message: 'Vui lòng nhập tên sản phẩm',
+                    trigger: 'change'
+                }, {
+                    max: 200,
+                    message: 'Nhập quá ký tự cho phép',
+                    trigger: 'change'
+                }],
+                code: [{
+                    max: 50,
+                    message: 'Nhập quá ký tự cho phép',
+                    trigger: 'change'
+                }],
+                price: [{
+                        max: 200,
+                        message: 'Nhập quá ký tự cho phép',
+                        trigger: 'change'
+                    },
+                    {
+                        pattern: /[0-9]/,
+                        message: 'Số tiền phải là con số',
+                        trigger: 'change'
+                    }
+                ],
+                percentDiscount: [{
+                        max: 4,
+                        message: 'Nhập quá ký tự cho phép',
+                        trigger: 'change'
+                    },
+                    {
+                        pattern: /^[1-9]$|^[1-9][0-9]$|^(100)$/,
+                        message: 'Phần trăm giảm giá từ 0 - 100%',
+                        trigger: 'change'
+                    }
+                ],
+                describe: [{
+                    max: 500,
+                    message: 'Nhập quá ký tự cho phép',
+                    trigger: 'change'
+                }]
             },
             multipleSelection: [],
             api: {
@@ -58,11 +122,16 @@ const app = new Vue({
 
             },
             title: 'Quản lý sản phẩm',
+            titleDialog: '',
             tabMain: 'index',
             searchProduct: '',
             valueOptional: '',
             listItem: [],
-            labelPositionTop: 'top'
+            labelPositionTop: 'top',
+            dialogFormProduct: false,
+            showImg: 'images/common/noimg.png',
+            isRemoteImage: false,
+            isCreateCategory: false
         }
     },
     mounted() {
@@ -102,6 +171,11 @@ const app = new Vue({
                     console.log(error);
                 })
         },
+        clickCreateProduct() {
+            let vm = this;
+            vm.dialogFormProduct = true;
+            vm.titleDialog = 'Thêm sản phẩm mới';
+        },
         //function to
         searchByProduct(searchForm) {
             let vm = this;
@@ -126,6 +200,68 @@ const app = new Vue({
                 });
             }
         },
+        createProduct(productForm) {
+            let vm = this;
+            vm.$refs[productForm].validate((valid) => {
+                if (valid) {
+                    const link = vm.api.linkAPI + 'product/create';
+
+                    const formData = new FormData();
+                    formData.append('fileIMG', vm.productForm.image);
+
+                    axios.post(link, formData, {
+                            params: JSON.parse(JSON.stringify(vm.productForm))
+                        })
+                        .then(function (response) {
+                            // handle success
+                            if (response.data.success) {
+                                if (response.status === 200) {
+                                    this.$notify({
+                                        title: 'Success',
+                                        message: 'Thêm sản phẩm [' + vm.productForm.name + '] thành công',
+                                        type: 'success'
+                                    });
+                                    vm.dialogFormProduct = false;
+                                    vm.$refs[productForm].resetFields();
+                                    vm.remoteImage(vm.productForm);
+                                    vm.loadProduct();
+                                }
+                            }
+                        })
+                        .catch(function (error) {
+                            // handle error
+                            console.log(error);
+                        })
+                } else {
+                    console.log('error submit!!');
+                    return false;
+                }
+            });
+        },
+        uploadImg(productForm) {
+            let vm = this;
+            const file = document.querySelector('input[type=file]').files[0];
+            console.log(file);
+            const reader = new FileReader();
+
+            reader.addEventListener("load", function () {
+                // convert image file to base64 string
+                vm.showImg = reader.result;
+            }, false);
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+
+            vm.isRemoteImage = true;
+            vm.productForm.image = file;
+        },
+        remoteImage(productForm) {
+            let vm = this;
+            vm.showImg = 'images/common/noimg.png';
+            vm.isRemoteImage = false;
+            vm.productForm.image = null;
+        },
         handleClickMain(tab, event) {
             console.log(tab.name);
         },
@@ -135,6 +271,11 @@ const app = new Vue({
         priceSumFormat(price, percentDiscount) {
             const format = price * (100 - percentDiscount) / 100;
             return this.formatPrice(format);
+        },
+        sumPrice(productForm) {
+            let vm = this;
+            const format = vm.productForm.price * (100 - vm.productForm.percentDiscount) / 100;
+            return vm.formatPrice(format);
         },
         formatPrice(price) {
             return price.toLocaleString('it-IT', {

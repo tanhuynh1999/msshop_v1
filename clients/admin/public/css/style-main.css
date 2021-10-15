@@ -58,6 +58,10 @@ html {}
     float: right;
 }
 
+.clearfix {
+    clear: both;
+}
+
 /*main*/
 .t-table .image {
     width: 100px;
@@ -76,4 +80,9 @@ html {}
 
 .dropdown-menu {
     left: -158px;
+}
+
+.el-dialog {
+    width: 70%;
+    margin-top: 7vh !important;
 }

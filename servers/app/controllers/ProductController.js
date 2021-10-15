@@ -1,7 +1,8 @@
+const productModel = require('../models/ProductModel');
+
 class ProductController {
     // *[GET]
     getProduct = (req, res, next) => {
-        console.log(req);
         res.json({
             data: this.checkError(req.query) ? [{
                     _id: '123321',
@@ -47,6 +48,18 @@ class ProductController {
             success: this.checkError(req.query)
         })
     }
+
+    createProduct = (req, res) => {
+        const productNew = new productModel(req.query);
+        productNew.image = req.file.filename;
+        productNew.save();
+
+        res.json({
+            success: true
+        })
+    }
+
+    // *[POST]
 
     checkError = (query) => {
         const checkUser = 'tanhuynh';
