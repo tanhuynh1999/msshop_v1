@@ -15,8 +15,8 @@
                                 {{> products/common/show}}
                                 <hr>
                                 <b>Có <span class="text-danger">0</span> sản phẩm</b>
-                                <el-table ref="multipleTable" :data="tableData" style="width: 100%"
-                                    @selection-change="handleSelectionChange" class="t-table mt-1">
+                                <el-table v-loading="loadingTableProduct" ref="multipleTable" :data="tableData"
+                                    style="width: 100%" @selection-change="handleSelectionChange" class="t-table mt-1">
                                     <el-table-column type="selection" width="55">
                                     </el-table-column>
                                     <el-table-column type="index" label="STT" width="55">
@@ -55,9 +55,14 @@
                                     </el-table-column>
                                     <el-table-column label="Danh mục" width="200" v-if="showTable.showCategory">
                                         <template slot-scope="scope">
-                                            <el-tag class="mt-1 ml-1" closable type="info">Áo thun</el-tag>
-                                            <el-tag class="mt-1 ml-1" closable type="info">Áo nam</el-tag>
-                                            <el-tag class="mt-1 ml-1" closable type="info">Áo không phải nữ</el-tag>
+                                            <el-tag v-if="item.idProduct == scope.row._id" class="mt-1 ml-1" closable
+                                                type="info" v-for="item in listData.listProductCategory"
+                                                :key="item._id">
+                                                <span v-if="item2._id == item.idCategory"
+                                                    v-for="item2 in listData.listCategory" :key="item._id">
+                                                    <span v-text="item2.name"></span>
+                                                </span>
+                                            </el-tag>
                                             <el-tag class="mt-1 ml-1 cp">
                                                 <i class="fa fa-plus-circle" aria-hidden="true"></i>
                                             </el-tag>

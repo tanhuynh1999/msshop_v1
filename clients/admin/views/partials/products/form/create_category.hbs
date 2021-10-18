@@ -1,11 +1,19 @@
 <div class="clearfix"></div>
-<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="120px" class="demo-ruleForm">
+<el-form :label-position="labelPositionTop" :model="categoryForm" :rules="categoryValidate" ref="categoryForm"
+    class="demo-ruleForm">
     <div class="row">
         <div class="col-lg-6">
         </div>
         <div class="col-lg-6">
-            <el-card shadow="hover">
-                Hover
+            <el-card shadow="hover" v-loading="loadingCreateCategory">
+                <el-form-item label="Tên danh mục">
+                    <el-input v-model="categoryForm.name" maxlength="200" clearable show-word-limit
+                        placeholder="Vui lòng nhập tên danh mục"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button size="small" @click="createCategory('categoryForm')" class="float-right mt-1"
+                        type="danger">Thêm danh mục</el-button>
+                </el-form-item>
             </el-card>
         </div>
     </div>

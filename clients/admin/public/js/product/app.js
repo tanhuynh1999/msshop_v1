@@ -37,15 +37,8 @@ const app = new Vue({
                         name: 'Bật hoạt động'
                     }
                 ],
-                listCategory: [{
-                        _id: 1,
-                        name: 'Áo'
-                    },
-                    {
-                        _id: 2,
-                        name: 'Quần'
-                    }
-                ]
+                listCategory: [],
+                listProductCategory: []
             },
             productForm: {
                 name: '',
@@ -58,6 +51,9 @@ const app = new Vue({
                 percentDiscount: 0,
                 active: true,
                 category: []
+            },
+            categoryForm: {
+                name: ''
             },
             productValidate: {
                 name: [{
@@ -102,6 +98,9 @@ const app = new Vue({
                     trigger: 'change'
                 }]
             },
+            categoryValidate: {
+
+            },
             multipleSelection: [],
             api: {
                 linkAPI: 'http://localhost:5000/',
@@ -131,11 +130,15 @@ const app = new Vue({
             dialogFormProduct: false,
             showImg: 'images/common/noimg.png',
             isRemoteImage: false,
-            isCreateCategory: false
+            isCreateCategory: false,
+            loadingCreateCategory: true,
+            loadingTableProduct: true
         }
     },
     mounted() {
         this.loadProduct();
+        this.loadCategory();
+        this.loadProductCategory();
     },
     methods: {
         handleSelectionChange(val) {
@@ -153,6 +156,61 @@ const app = new Vue({
                     if (response.data.success) {
                         if (response.status == 200) {
                             vm.tableData = response.data.data;
+                            vm.loadingTableProduct = false;
+                        } else {
+                            vm.$message({
+                                message: 'Gián đoạn vui lòng tải lại!',
+                                type: 'warning'
+                            });
+                        }
+                    } else {
+                        vm.$message({
+                            message: 'Gián đoạn vui lòng tải lại.',
+                            type: 'warning'
+                        });
+                    }
+                })
+                .catch(function (error) {
+                    // handle error
+                    console.log(error);
+                })
+        },
+        loadCategory() {
+            let vm = this;
+            const link = vm.api.linkAPI + 'product/category/get';
+            axios.get(link)
+                .then(function (response) {
+                    // handle success
+                    if (response.data.success) {
+                        if (response.status == 200) {
+                            vm.listData.listCategory = response.data.data;
+                        } else {
+                            vm.$message({
+                                message: 'Gián đoạn vui lòng tải lại!',
+                                type: 'warning'
+                            });
+                        }
+                    } else {
+                        vm.$message({
+                            message: 'Gián đoạn vui lòng tải lại.',
+                            type: 'warning'
+                        });
+                    }
+                })
+                .catch(function (error) {
+                    // handle error
+                    console.log(error);
+                })
+        },
+        loadProductCategory() {
+            let vm = this;
+            const link = vm.api.linkAPI + 'product/category/group';
+            axios.get(link)
+                .then(function (response) {
+                    // handle success
+                    if (response.data.success) {
+                        if (response.status == 200) {
+                            vm.listData.listProductCategory = response.data.data;
                         } else {
                             vm.$message({
                                 message: 'Gián đoạn vui lòng tải lại!',
@@ -175,6 +233,18 @@ const app = new Vue({
             let vm = this;
             vm.dialogFormProduct = true;
             vm.titleDialog = 'Thêm sản phẩm mới';
+        },
+        clickCreateCategory() {
+            let vm = this;
+            vm.isCreateCategory = true;
+            setTimeout(function () {
+                vm.loadingCreateCategory = false;
+            }, 1000);
+        },
+        clickCloseCreateCategory() {
+            let vm = this;
+            vm.isCreateCategory = false;
+            vm.loadingCreateCategory = true;
         },
         //function to
         searchByProduct(searchForm) {
@@ -216,7 +286,7 @@ const app = new Vue({
                             // handle success
                             if (response.data.success) {
                                 if (response.status === 200) {
-                                    this.$notify({
+                                    vm.$notify({
                                         title: 'Success',
                                         message: 'Thêm sản phẩm [' + vm.productForm.name + '] thành công',
                                         type: 'success'
@@ -225,6 +295,7 @@ const app = new Vue({
                                     vm.$refs[productForm].resetFields();
                                     vm.remoteImage(vm.productForm);
                                     vm.loadProduct();
+                                    vm.loadProductCategory();
                                 }
                             }
                         })
@@ -232,6 +303,39 @@ const app = new Vue({
                             // handle error
                             console.log(error);
                         })
+                } else {
+                    console.log('error submit!!');
+                    return false;
+                }
+            });
+        },
+        createCategory(categoryForm) {
+            let vm = this;
+            vm.$refs[categoryForm].validate((valid) => {
+                if (valid) {
+                    const link = vm.api.linkAPI + 'product/category/create?name=' + vm.categoryForm.name;
+                    axios.post(link)
+                        .then(function (response) {
+                            // handle success
+                            if (response.data.success) {
+                                vm.$notify({
+                                    title: 'Thành công',
+                                    message: 'Thêm danh  [' + vm.categoryForm.name + '] thành công',
+                                    type: 'success'
+                                });
+                                vm.clickCloseCreateCategory();
+                                vm.categoryForm.name = null;
+                                vm.loadCategory();
+                            }
+                            console.log(response);
+                        })
+                        .catch(function (error) {
+                            // handle error
+                            console.log(error);
+                        })
+                        .then(function () {
+                            // always executed
+                        });
                 } else {
                     console.log('error submit!!');
                     return false;

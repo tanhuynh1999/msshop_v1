@@ -33,7 +33,8 @@
                             :value="item._id">
                         </el-option>
                     </el-select>
-                    <a href="" class="float-right">Thêm danh mục</a>
+                    <a @click="clickCreateCategory" v-if="!isCreateCategory" class="float-right">Thêm danh mục</a>
+                    <a @click="clickCloseCreateCategory" v-if="isCreateCategory" class="float-right">Đóng danh mục</a>
                     <div v-if="isCreateCategory">{{> products/form/create_category}}</div>
                 </el-form-item>
                 <div class="row">
